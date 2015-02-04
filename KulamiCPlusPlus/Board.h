@@ -1,3 +1,5 @@
+// Author: Amadeus Sanchez
+
 #include <vector>
 #include <map>
 #include "Tile.h"

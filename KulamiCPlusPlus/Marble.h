@@ -1,4 +1,6 @@
-#include"Position.h"
+// Author: Amadeus Sanchez
+
+#include "Position.h"
 #pragma once
 class Marble
 {

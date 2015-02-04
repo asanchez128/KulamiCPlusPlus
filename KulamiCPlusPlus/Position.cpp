@@ -1,5 +1,6 @@
-#include "Position.h"
+// Author: Amadeus Sanchez
 
+#include "Position.h"
 
 Position::Position()
 {

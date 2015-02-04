@@ -1,3 +1,5 @@
+// Author: Amadeus Sanchez
+
 #pragma once
 class Player
 {

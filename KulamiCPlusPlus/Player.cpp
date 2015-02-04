@@ -1,5 +1,6 @@
-#include "Player.h"
+// Author: Amadeus Sanchez
 
+#include "Player.h"
 
 Player::Player()
 {
@@ -9,6 +10,10 @@ Player::Player()
 Player::Player(int _c)
 {
 	color = _c;
+}
+
+Player::~Player()
+{
 }
 
 bool makeMove();

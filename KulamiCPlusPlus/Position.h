@@ -1,3 +1,4 @@
+// Author: Amadeus Sanchez
 
 #pragma once
 class Position

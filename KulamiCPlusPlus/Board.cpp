@@ -1,4 +1,6 @@
+// Author: Amadeus Sanchez
 #include "Board.h"
+
 #ifdef _MSC_VER
 #define _CRT_SECURE_NO_WARNINGS
 #endif
@@ -54,8 +56,8 @@ void Board::printBoard(){
 	}
 
 	for (auto tile : tiles){
-		for (int i = (tile.lowerLeft.horizontal - 1) * 3 + 2; i <= (tile.upperRight.horizontal - 1) * 3 + 2; ++i){
-			for (int j = (tile.lowerLeft.vertical - 1) * 3 + 2; j <= (tile.upperRight.vertical - 1) * 3 + 2; ++j){
+		for (int i = (tile.lowerLeft.vertical - 1) * 3 + 2; i <= (tile.upperRight.vertical - 1) * 3 + 2; ++i){
+			for (int j = (tile.lowerLeft.horizontal - 1) * 3 + 2; j <= (tile.upperRight.horizontal - 1) * 3 + 2; ++j){
 				boardChar[i][j] = '+';
 			}
 		}

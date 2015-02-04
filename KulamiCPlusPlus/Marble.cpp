@@ -1,3 +1,5 @@
+// Author: Amadeus Sanchez
+
 #include "Marble.h"
 
 Marble::Marble()

@@ -1,7 +1,11 @@
+// Author: Amadeus Sanchez
 #include "Game.h"
 #include "Board.h"
 #include <vector>
 #include <algorithm>
+#include <cmath>
+#include <cstdlib>     /* srand, rand */
+#include <ctime>    
 
 Game::Game()
 {
@@ -32,7 +36,9 @@ bool Game::makeMove(Player player, Position position){
 		if (!(positionIsInLastPlayedTile(position) || positionIsInSecondToLastPlayedTile(position))){
 			if ((positionIsInSameHorizontal(position) || positionIsInSameVertical(position) ) ){
 				board.taken[position] = true;
+				
 				lastPlayedPosition = position;
+
 				indexSecondToLastPlayedTile = indexLastPlayedTile;
 				indexLastPlayedTile = board.indexOfTileInPosition[position];
 				board.tiles[indexLastPlayedTile].marbles[position] = player.color;
@@ -139,4 +145,18 @@ void Game::getWinner(){
 	else {
 		printf("There was a tie!\n");
 	}
+	getchar();
+	getchar();
+}
+
+bool Game::computerMakeMove(Player p){
+	std::vector<std::pair<int, int >> _v = posibleNextMoves();
+	if (!_v.empty()){
+		srand(time(NULL));
+		int randomIndex = rand() % _v.size();
+		makeMove(p, Position(_v[randomIndex].first, _v[randomIndex].second));
+		printf("Computer move:\nhorizontal:%d\nvertical:%d\n", _v[randomIndex].first, _v[randomIndex].second);
+		return true;
+	}
+	return false;
 }

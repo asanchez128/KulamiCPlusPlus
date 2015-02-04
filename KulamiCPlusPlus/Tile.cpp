@@ -1,5 +1,6 @@
-#include "Tile.h"
+// Author: Amadeus Sanchez
 
+#include "Tile.h"
 
 // TODO
 Tile::Tile()

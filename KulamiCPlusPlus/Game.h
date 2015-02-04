@@ -1,3 +1,5 @@
+// Author: Amadeus Sanchez
+
 #pragma once
 #include "Player.h"
 #include "Position.h"
@@ -23,5 +25,6 @@ public:
 	bool positionIsInSameVertical(Position);
 	std::vector<std::pair<int, int>> posibleNextMoves();
 	void getWinner();
+	bool computerMakeMove(Player);
 };
 
