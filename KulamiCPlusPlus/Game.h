@@ -30,7 +30,7 @@ public:
 	void getWinner();
 	bool computerMakeMove(Player);
 	bool computerMakeMoveMinimax(Player);
-	int minimax(Position, int, bool, int);
+	int minimax(Position, int, int, int, bool, int);
 	void unmakeMove(Position, Player);
     void getChildNodes(Position p, std::vector<Position> &v);
 };

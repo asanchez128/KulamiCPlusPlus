@@ -243,7 +243,7 @@ bool Game::computerMakeMoveMinimax(Player p){
 		{
 			if (p.color == 1)
 			{
-				minimaxMax = minimax(move, 3, true, 1);
+				minimaxMax = minimax(move, 2, -INF, INF, true, 1);
 				if (maximum < minimaxMax)
 				{
 					maximum = minimaxMax;
@@ -252,7 +252,7 @@ bool Game::computerMakeMoveMinimax(Player p){
 			}
 			else
 			{
-				minimaxMin = minimax(move, 3, false, 2);
+				minimaxMin = minimax(move, 2, -INF, INF, false, 2);
 				if (minimum > minimaxMin)
 				{
 					minimum = minimaxMin;
@@ -273,7 +273,7 @@ bool Game::computerMakeMoveMinimax(Player p){
 
 
 // I am going to return the same value for any configuration in the meantime.
-int Game::minimax(Position node, int depth, bool maximazingPlayer, int color){
+int Game::minimax(Position node, int depth, int alpha, int beta, bool maximazingPlayer, int color){
 	
 	// if depth = 0 or node is a terminal node
 	// return the heuristic value of node
@@ -288,7 +288,6 @@ int Game::minimax(Position node, int depth, bool maximazingPlayer, int color){
 		}
 		if (color == 1)
 			return sum1 - sum2;
-		//board.tiles[indexLastPlayedTile].marblesPlayer1 - board.tiles[indexLastPlayedTile].marblesPlayer2;
 		else
 			return sum2 - sum1;
 	}
@@ -296,17 +295,29 @@ int Game::minimax(Position node, int depth, bool maximazingPlayer, int color){
 	if (maximazingPlayer == true)
 	{
 		bestValue = -INF;
-		
+		val = -INF;
 		std::vector<Position> _v;
 		getChildNodes(node, _v);
-		for (auto position : _v){
+		bool done = false;
+		for (size_t t = 0; t < _v.size() && !done; ++t){
+			Position position = _v[t];
 			if (color == 1){
 				makeMove(1, position);
-				val = minimax(position, depth - 1, true, 1);
+				val = std::max(val, minimax(position, depth - 1, alpha, beta, false, 2));
+				alpha = std::max(alpha, val);
+				if (beta <= alpha)
+				{
+					done = true;
+				}
 			}
 			else if (color == 2){
 				makeMove(2, position);
-				val = minimax(position, depth - 1, false, 2);
+				val = std::min(val, minimax(position, depth - 1, alpha, beta, true, 1));
+				beta = std::min(beta, val);
+				if (beta <= alpha)
+				{
+					done = true;
+				}
 			}
 			bestValue = std::max(val, bestValue);
 
@@ -319,16 +330,31 @@ int Game::minimax(Position node, int depth, bool maximazingPlayer, int color){
 	}
 	else{
 		bestValue = INF;
+		val = INF;
 		std::vector<Position> _v;
 		getChildNodes(node, _v);
-		for (auto position : _v){
+		bool done = false;
+		for (size_t t = 0; t < _v.size() && !done; ++t){
+			Position position = _v[t];
 			if (color == 1){
-				makeMove(2, position);
-				val = minimax(position, depth - 1, true, 1);
+				makeMove(1, position);
+				val = std::max(val, minimax(position, depth - 1, alpha, beta, false, 2));
+				alpha = std::max(alpha, val);
+				if (beta <= alpha)
+				{
+					done = true;
+					//break;
+				}
 			}
 			else if (color == 2){
-				makeMove(1, position);
-				val = minimax(position, depth - 1, false, 2);
+				makeMove(2, position);
+				val = std::min(val, minimax(position, depth - 1, alpha, beta, true, 1));
+				beta = std::min(beta, val);
+				if (beta <= alpha)
+				{
+					done = true;
+					//break;
+				}
 			}
 
 			bestValue = std::min(val, bestValue);
