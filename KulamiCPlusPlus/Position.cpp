@@ -24,4 +24,5 @@ bool Position::operator< (const Position& p)const{
 }
 Position::~Position()
 {
+
 }

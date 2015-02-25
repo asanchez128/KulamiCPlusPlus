@@ -8,8 +8,6 @@
 class Tile
 {
 private:
-	// width <= height
-
 	
 public:
 	int width, height, size;
@@ -22,6 +20,7 @@ public:
 	Tile();
 	Tile(int, int, Position, Position, int);
 	bool isEmpty(Position);
+	int marblesPlayer1, marblesPlayer2;
 	~Tile();
 };
 

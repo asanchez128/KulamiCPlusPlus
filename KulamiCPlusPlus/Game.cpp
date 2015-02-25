@@ -22,7 +22,8 @@ Game::~Game()
 
 bool Game::isGameOver(){
 	bool result = false;
-	std::vector<std::pair<int, int>> _nextMoves = posibleNextMoves();
+	std::vector<Position> _nextMoves;
+	posibleNextMoves(_nextMoves);
 	if (_nextMoves.empty()){
 		result = true;
 	}
@@ -36,12 +37,19 @@ bool Game::makeMove(Player player, Position position){
 		if (!(positionIsInLastPlayedTile(position) || positionIsInSecondToLastPlayedTile(position))){
 			if ((positionIsInSameHorizontal(position) || positionIsInSameVertical(position) ) ){
 				board.taken[position] = true;
-				
+				thirdToLastPlayedPosition = secondToLastPlayedPosition;
+				secondToLastPlayedPosition = lastPlayedPosition;
 				lastPlayedPosition = position;
 
+				indexThirdToLastPlayedPosition = indexSecondToLastPlayedTile;
 				indexSecondToLastPlayedTile = indexLastPlayedTile;
 				indexLastPlayedTile = board.indexOfTileInPosition[position];
 				board.tiles[indexLastPlayedTile].marbles[position] = player.color;
+				if (player.color == 1)
+					board.tiles[indexLastPlayedTile].marblesPlayer1++;
+				else if (player.color == 2)
+					board.tiles[indexLastPlayedTile].marblesPlayer2++;
+
 				return true;
 			}
 		}
@@ -62,6 +70,10 @@ bool Game::positionIsInLastPlayedTile(Position position){
 }
 
 bool Game::positionIsInSameVertical(Position position){
+	if (lastPlayedPosition.vertical == -1){
+		return true;
+	}
+	else 
 	return lastPlayedPosition.vertical == position.vertical;
 }
 
@@ -77,44 +89,58 @@ bool Game::positionIsInSecondToLastPlayedTile(Position position){
 	return result;
 }
 
-std::vector<std::pair<int, int>> Game::posibleNextMoves(){
-	std::vector<std::pair<int, int>> v;
-	for (int i = 1; i < lastPlayedPosition.horizontal; ++i){
-		Position p(i, lastPlayedPosition.vertical);
-		if (!board.isPositionTaken(p)){
-			if (!(positionIsInLastPlayedTile(p) || positionIsInSecondToLastPlayedTile(p))){
-				v.push_back(std::make_pair(p.horizontal, p.vertical));
+// v must be an empty vector of type Position
+void Game::posibleNextMoves(std::vector<Position> &v){
+	if (lastPlayedPosition.horizontal == -1 &&
+		lastPlayedPosition.vertical == -1)
+	{
+		// We are starting off this game
+		for (int i = 1; i <= 8; ++i){
+			for (int j = 1; j <= 8; ++j){
+				v.push_back(Position(i, j));
 			}
 		}
 	}
-
-	for (int i = lastPlayedPosition.horizontal + 1; i <= 8; ++i){
-		Position p(i, lastPlayedPosition.vertical);
-		if (!board.isPositionTaken(p)){
-			if (!(positionIsInLastPlayedTile(p) || positionIsInSecondToLastPlayedTile(p))){
-				v.push_back(std::make_pair(p.horizontal, p.vertical));
+	else
+	{
+		for (int i = 1; i < lastPlayedPosition.horizontal; ++i){
+			Position p(i, lastPlayedPosition.vertical);
+			if (!board.isPositionTaken(p)){
+				if (!(positionIsInLastPlayedTile(p) || positionIsInSecondToLastPlayedTile(p))){
+					v.push_back(p);
+				}
 			}
 		}
-	}
 
-	for (int i = lastPlayedPosition.vertical + 1; i <= 8; ++i){
-		Position p(lastPlayedPosition.horizontal, i);
-		if (!board.isPositionTaken(p)){
-			if (!(positionIsInLastPlayedTile(p) || positionIsInSecondToLastPlayedTile(p))){
-				v.push_back(std::make_pair(p.horizontal, p.vertical));
+		for (int i = lastPlayedPosition.horizontal + 1; i <= 8; ++i){
+			Position p(i, lastPlayedPosition.vertical);
+			if (!board.isPositionTaken(p)){
+				if (!(positionIsInLastPlayedTile(p) || positionIsInSecondToLastPlayedTile(p))){
+					v.push_back(p);
+				}
+			}
+		}
+
+		for (int i = lastPlayedPosition.vertical + 1; i <= 8; ++i){
+			Position p(lastPlayedPosition.horizontal, i);
+			if (!board.isPositionTaken(p)){
+				if (!(positionIsInLastPlayedTile(p) || positionIsInSecondToLastPlayedTile(p))){
+					v.push_back(p);
+				}
+			}
+		}
+
+		for (int i = 1; i < lastPlayedPosition.vertical; ++i){
+			Position p(lastPlayedPosition.horizontal, i);
+			if (!board.isPositionTaken(p)){
+				if (!(positionIsInLastPlayedTile(p) || positionIsInSecondToLastPlayedTile(p))){
+					v.push_back(p);
+				}
 			}
 		}
 	}
 	
-	for (int i = 1; i < lastPlayedPosition.vertical; ++i){
-		Position p(lastPlayedPosition.horizontal, i);
-		if (!board.isPositionTaken(p)){
-			if (!(positionIsInLastPlayedTile(p) || positionIsInSecondToLastPlayedTile(p))){
-				v.push_back(std::make_pair(p.horizontal, p.vertical));
-			}
-		}
-	}
-	return v;
+	return;
 }
 
 void Game::getWinner(){
@@ -123,10 +149,11 @@ void Game::getWinner(){
 	for (auto tile : board.tiles){
 		counter1 = 0; counter2 = 0;
 		for (auto marble : tile.marbles){
-			if (marble.second == 1)counter1++;
-			else if (marble.second == 2)counter2++;
+			if (marble.second == 1) counter1++;
+			else if (marble.second == 2) counter2++;
 		}
-		if (counter1 > counter2){
+		if (counter1 > counter2)
+		{
 			points1 += tile.size;
 		}
 		else if (counter1 < counter2){
@@ -134,13 +161,13 @@ void Game::getWinner(){
 		}
 	}
 
-	if (counter1 > counter2){
-		printf("Player 1 won by %d\n", counter1);
-		printf("The score of player 2 was\n", counter2);
+	if (points1 > points2){
+		printf("Player 1 won by %d\n", points1);
+		printf("The score of player 2 was %d\n", points2);
 	}
-	else if (counter2 > counter1){
-		printf("Player 2 won by %d\n", counter1);
-		printf("The score of player 1 was\n", counter2);
+	else if (points2 > points1){
+		printf("Player 2 won by %d\n", points1);
+		printf("The score of player 1 was %d\n", points2);
 	}
 	else {
 		printf("There was a tie!\n");
@@ -150,13 +177,180 @@ void Game::getWinner(){
 }
 
 bool Game::computerMakeMove(Player p){
-	std::vector<std::pair<int, int >> _v = posibleNextMoves();
+	std::vector<Position> _v;
+	posibleNextMoves(_v);
 	if (!_v.empty()){
 		srand(time(NULL));
 		int randomIndex = rand() % _v.size();
-		makeMove(p, Position(_v[randomIndex].first, _v[randomIndex].second));
-		printf("Computer move:\nhorizontal:%d\nvertical:%d\n", _v[randomIndex].first, _v[randomIndex].second);
+		makeMove(p, Position(_v[randomIndex].horizontal, _v[randomIndex].vertical));
+		printf("Computer move:\nhorizontal:%d\nvertical:%d\n", _v[randomIndex].horizontal, _v[randomIndex].vertical);
 		return true;
 	}
 	return false;
+}
+
+void Game::getChildNodes(Position q, std::vector<Position> &v)
+{
+		for (int i = 1; i < q.horizontal; ++i){
+			Position p(i, q.vertical);
+			if (!board.isPositionTaken(p)){
+				if (!(positionIsInLastPlayedTile(p) || positionIsInSecondToLastPlayedTile(p))){
+					v.push_back(p);
+				}
+			}
+		}
+
+		for (int i = q.horizontal + 1; i <= 8; ++i){
+			Position p(i, q.vertical);
+			if (!board.isPositionTaken(p)){
+				if (!(positionIsInLastPlayedTile(p) || positionIsInSecondToLastPlayedTile(p))){
+					v.push_back(p);
+				}
+			}
+		}
+
+		for (int i = q.vertical + 1; i <= 8; ++i){
+			Position p(q.horizontal, i);
+			if (!board.isPositionTaken(p)){
+				if (!(positionIsInLastPlayedTile(p) || positionIsInSecondToLastPlayedTile(p))){
+					v.push_back(p);
+				}
+			}
+		}
+
+		for (int i = 1; i < q.vertical; ++i){
+			Position p(q.horizontal, i);
+			if (!board.isPositionTaken(p)){
+				if (!(positionIsInLastPlayedTile(p) || positionIsInSecondToLastPlayedTile(p))){
+				v.push_back(p);
+			}
+		}
+	}
+	return;
+
+}
+
+bool Game::computerMakeMoveMinimax(Player p){ 
+	bool result = false; 
+	std::vector<Position> _v;
+	posibleNextMoves(_v);
+	int maximum = -INF;
+	int minimum = INF;
+	int minimaxMax, minimaxMin;
+	Position nextMove;
+	if (!_v.empty()){
+		for (auto move : _v)
+		{
+			if (p.color == 1)
+			{
+				minimaxMax = minimax(move, 3, true, 1);
+				if (maximum < minimaxMax)
+				{
+					maximum = minimaxMax;
+					nextMove = move;
+				}
+			}
+			else
+			{
+				minimaxMin = minimax(move, 3, false, 2);
+				if (minimum > minimaxMin)
+				{
+					minimum = minimaxMin;
+					nextMove = move;
+				}
+			}
+				
+		}
+		printf("Player %d will move %d\n horizontal and %d\n vertical\n", p, nextMove.horizontal, nextMove.vertical);
+		
+		makeMove(p, nextMove);
+		return true;
+	}
+	return false;
+
+	return result;
+}
+
+
+// I am going to return the same value for any configuration in the meantime.
+int Game::minimax(Position node, int depth, bool maximazingPlayer, int color){
+	
+	// if depth = 0 or node is a terminal node
+	// return the heuristic value of node
+	if ((depth == 0) || isGameOver()){
+		int sum1 = 0;
+		int sum2 = 0;
+		for (auto tile : board.tiles){
+			if (tile.marblesPlayer1 > tile.marblesPlayer2)
+				sum1 += tile.size;
+			else if (tile.marblesPlayer1 < tile.marblesPlayer2)
+				sum2 += tile.size;
+		}
+		if (color == 1)
+			return sum1 - sum2;
+		//board.tiles[indexLastPlayedTile].marblesPlayer1 - board.tiles[indexLastPlayedTile].marblesPlayer2;
+		else
+			return sum2 - sum1;
+	}
+	int val, bestValue;
+	if (maximazingPlayer == true)
+	{
+		bestValue = -INF;
+		
+		std::vector<Position> _v;
+		getChildNodes(node, _v);
+		for (auto position : _v){
+			if (color == 1){
+				makeMove(1, position);
+				val = minimax(position, depth - 1, true, 1);
+			}
+			else if (color == 2){
+				makeMove(2, position);
+				val = minimax(position, depth - 1, false, 2);
+			}
+			bestValue = std::max(val, bestValue);
+
+			if (color == 1)
+				unmakeMove(position, 1);
+			else
+				unmakeMove(position, 2);
+		}
+		return bestValue;
+	}
+	else{
+		bestValue = INF;
+		std::vector<Position> _v;
+		getChildNodes(node, _v);
+		for (auto position : _v){
+			if (color == 1){
+				makeMove(2, position);
+				val = minimax(position, depth - 1, true, 1);
+			}
+			else if (color == 2){
+				makeMove(1, position);
+				val = minimax(position, depth - 1, false, 2);
+			}
+
+			bestValue = std::min(val, bestValue);
+			if (color == 1)
+				unmakeMove(position, 1);
+			else
+				unmakeMove(position, 2);
+		}
+		return bestValue;
+	}
+}
+
+void Game::unmakeMove(Position position, Player player){
+	board.taken[position] = false;
+	board.tiles[indexLastPlayedTile].marbles[position] = -1;
+	indexLastPlayedTile = indexSecondToLastPlayedTile;
+	indexSecondToLastPlayedTile = indexThirdToLastPlayedPosition;
+	lastPlayedPosition = secondToLastPlayedPosition;
+	secondToLastPlayedPosition = thirdToLastPlayedPosition;
+
+	if (player.color == 1 && indexLastPlayedTile >= 0)
+		board.tiles[indexLastPlayedTile].marblesPlayer1--;
+	else if (player.color == 2 && indexLastPlayedTile >= 0)
+		board.tiles[indexLastPlayedTile].marblesPlayer2--;
 }
