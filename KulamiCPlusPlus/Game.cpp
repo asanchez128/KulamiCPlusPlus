@@ -166,8 +166,8 @@ void Game::getWinner(){
 		printf("The score of player 2 was %d\n", points2);
 	}
 	else if (points2 > points1){
-		printf("Player 2 won by %d\n", points1);
-		printf("The score of player 1 was %d\n", points2);
+		printf("Player 2 won by %d\n", points2);
+		printf("The score of player 1 was %d\n", points1);
 	}
 	else {
 		printf("There was a tie!\n");
@@ -312,8 +312,8 @@ int Game::minimax(Position node, int depth, int alpha, int beta, bool maximazing
 			}
 			else if (color == 2){
 				makeMove(2, position);
-				val = std::min(val, minimax(position, depth - 1, alpha, beta, true, 1));
-				beta = std::min(beta, val);
+				val = std::max(val, minimax(position, depth - 1, alpha, beta, false, 1));
+				alpha = std::max(beta, val);
 				if (beta <= alpha)
 				{
 					done = true;
@@ -338,8 +338,8 @@ int Game::minimax(Position node, int depth, int alpha, int beta, bool maximazing
 			Position position = _v[t];
 			if (color == 1){
 				makeMove(1, position);
-				val = std::max(val, minimax(position, depth - 1, alpha, beta, false, 2));
-				alpha = std::max(alpha, val);
+				val = std::min(val, minimax(position, depth - 1, alpha, beta, true, 2));
+				beta = std::min(beta, val);
 				if (beta <= alpha)
 				{
 					done = true;
