@@ -6,15 +6,16 @@
 #include <cmath>
 #include <cstdlib>     /* srand, rand */
 #include <ctime>    
-
+#define START 0
+#define END 7
 Game::Game()
 {
 	indexLastPlayedTile = -1;
 	indexSecondToLastPlayedTile = -1;
 	lastPlayedPosition.horizontal = -1;
-	lastPlayedPosition.vertical - 1;
+	lastPlayedPosition.vertical =  - 1;
+	board.setTypeBoard(7);
 }
-
 
 Game::~Game()
 {
@@ -95,15 +96,15 @@ void Game::posibleNextMoves(std::vector<Position> &v){
 		lastPlayedPosition.vertical == -1)
 	{
 		// We are starting off this game
-		for (int i = 1; i <= 8; ++i){
-			for (int j = 1; j <= 8; ++j){
+		for (int i = START; i <= END; ++i){
+			for (int j = START; j <= END; ++j){
 				v.push_back(Position(i, j));
 			}
 		}
 	}
 	else
 	{
-		for (int i = 1; i < lastPlayedPosition.horizontal; ++i){
+		for (int i = START; i < lastPlayedPosition.horizontal; ++i){
 			Position p(i, lastPlayedPosition.vertical);
 			if (!board.isPositionTaken(p)){
 				if (!(positionIsInLastPlayedTile(p) || positionIsInSecondToLastPlayedTile(p))){
@@ -112,7 +113,7 @@ void Game::posibleNextMoves(std::vector<Position> &v){
 			}
 		}
 
-		for (int i = lastPlayedPosition.horizontal + 1; i <= 8; ++i){
+		for (int i = lastPlayedPosition.horizontal + 1; i <= END; ++i){
 			Position p(i, lastPlayedPosition.vertical);
 			if (!board.isPositionTaken(p)){
 				if (!(positionIsInLastPlayedTile(p) || positionIsInSecondToLastPlayedTile(p))){
@@ -121,7 +122,7 @@ void Game::posibleNextMoves(std::vector<Position> &v){
 			}
 		}
 
-		for (int i = lastPlayedPosition.vertical + 1; i <= 8; ++i){
+		for (int i = lastPlayedPosition.vertical + 1; i <= END; ++i){
 			Position p(lastPlayedPosition.horizontal, i);
 			if (!board.isPositionTaken(p)){
 				if (!(positionIsInLastPlayedTile(p) || positionIsInSecondToLastPlayedTile(p))){
@@ -130,7 +131,7 @@ void Game::posibleNextMoves(std::vector<Position> &v){
 			}
 		}
 
-		for (int i = 1; i < lastPlayedPosition.vertical; ++i){
+		for (int i = START; i < lastPlayedPosition.vertical; ++i){
 			Position p(lastPlayedPosition.horizontal, i);
 			if (!board.isPositionTaken(p)){
 				if (!(positionIsInLastPlayedTile(p) || positionIsInSecondToLastPlayedTile(p))){
@@ -191,7 +192,7 @@ bool Game::computerMakeMove(Player p){
 
 void Game::getChildNodes(Position q, std::vector<Position> &v)
 {
-		for (int i = 1; i < q.horizontal; ++i){
+		for (int i = START; i < q.horizontal; ++i){
 			Position p(i, q.vertical);
 			if (!board.isPositionTaken(p)){
 				if (!(positionIsInLastPlayedTile(p) || positionIsInSecondToLastPlayedTile(p))){
@@ -200,7 +201,7 @@ void Game::getChildNodes(Position q, std::vector<Position> &v)
 			}
 		}
 
-		for (int i = q.horizontal + 1; i <= 8; ++i){
+		for (int i = q.horizontal + 1; i <= END; ++i){
 			Position p(i, q.vertical);
 			if (!board.isPositionTaken(p)){
 				if (!(positionIsInLastPlayedTile(p) || positionIsInSecondToLastPlayedTile(p))){
@@ -209,7 +210,7 @@ void Game::getChildNodes(Position q, std::vector<Position> &v)
 			}
 		}
 
-		for (int i = q.vertical + 1; i <= 8; ++i){
+		for (int i = q.vertical + 1; i <= END; ++i){
 			Position p(q.horizontal, i);
 			if (!board.isPositionTaken(p)){
 				if (!(positionIsInLastPlayedTile(p) || positionIsInSecondToLastPlayedTile(p))){
@@ -218,7 +219,7 @@ void Game::getChildNodes(Position q, std::vector<Position> &v)
 			}
 		}
 
-		for (int i = 1; i < q.vertical; ++i){
+		for (int i = START; i < q.vertical; ++i){
 			Position p(q.horizontal, i);
 			if (!board.isPositionTaken(p)){
 				if (!(positionIsInLastPlayedTile(p) || positionIsInSecondToLastPlayedTile(p))){
@@ -313,7 +314,7 @@ int Game::minimax(Position node, int depth, int alpha, int beta, bool maximazing
 			else if (color == 2){
 				makeMove(2, position);
 				val = std::max(val, minimax(position, depth - 1, alpha, beta, false, 1));
-				alpha = std::max(beta, val);
+				alpha = std::max(alpha, val);
 				if (beta <= alpha)
 				{
 					done = true;

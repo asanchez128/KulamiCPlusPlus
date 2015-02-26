@@ -92,6 +92,7 @@ int main(){
 		std::cout << std::endl << std::endl;
 		++sum;
 	}
+	printf("Done!\n");
 	game.getWinner();
 	return 0;
 }

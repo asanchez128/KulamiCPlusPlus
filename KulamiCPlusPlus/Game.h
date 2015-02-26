@@ -10,6 +10,7 @@ class Game
 private:
 	enum PlayerNumber{PLAYER_1, PLAYER_2};
 	int const INF = 1000000000;
+	int typeBoard = 6;
 public:
 	Position lastPlayedPosition;
 	Position secondToLastPlayedPosition;
