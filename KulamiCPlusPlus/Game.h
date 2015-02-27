@@ -12,6 +12,7 @@ private:
 	int const INF = 1000000000;
 	int typeBoard = 6;
 public:
+	int currentPlayer;
 	Position lastPlayedPosition;
 	Position secondToLastPlayedPosition;
 	Position thirdToLastPlayedPosition;
@@ -31,10 +32,10 @@ public:
 	void getWinner();
 	bool computerMakeMove(Player);
 	bool computerMakeMovealphaBeta(Player);
-	int alphaBeta(Position, int, int, int, bool, int);
+	int alphaBeta(Position, int, int, int, int);
 	void unmakeMove(Position, Player);
     void getChildNodes(Position p, std::vector<Position> &v);
 	bool computerMakeMoveMinimax(Player);
-	int minimax(Position, int, bool, int);
+	int minimax(Position, int, int);
 };
 

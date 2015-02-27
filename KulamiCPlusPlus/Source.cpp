@@ -48,6 +48,7 @@ int main(){
 	while (!game.isGameOver() && sum <= 56){
 		if (sum % 2 == 1)
 		{
+			game.currentPlayer = 1;
 			if (optionPlayer1 == 1)
 			{
 				do{
@@ -77,6 +78,7 @@ int main(){
 		}
 		else
 		{
+			game.currentPlayer = 2;
 			if (optionPlayer2 == 1)
 			{
 				do{
@@ -107,6 +109,8 @@ int main(){
 		game.board.printBoard();
 		std::cout << std::endl << std::endl;
 		++sum;
+		game.getWinner();
+		getchar();
 	}
 	printf("Done!\n");
 	game.getWinner();
