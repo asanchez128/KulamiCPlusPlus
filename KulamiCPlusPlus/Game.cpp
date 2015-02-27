@@ -78,6 +78,10 @@ bool Game::positionIsInSameVertical(Position position){
 }
 
 bool Game::positionIsInSameHorizontal(Position position){
+	if (lastPlayedPosition.horizontal == -1){
+		return true;
+	}
+	else
 	return lastPlayedPosition.horizontal == position.horizontal;
 }
 bool Game::positionIsInSecondToLastPlayedTile(Position position){
@@ -172,8 +176,8 @@ void Game::getWinner(){
 	else {
 		printf("There was a tie!\n");
 	}
-	getchar();
-	getchar();
+//	getchar();
+//	getchar();
 }
 
 bool Game::computerMakeMove(Player p){
@@ -235,29 +239,17 @@ bool Game::computerMakeMovealphaBeta(Player p){
 	std::vector<Position> _v;
 	posibleNextMoves(_v);
 	int maximum = -INF;
-	int minimum = INF;
+	//int minimum = INF;
 	int alphaBetaMax, alphaBetaMin;
 	Position nextMove;
 	if (!_v.empty()){
 		for (auto move : _v)
 		{
-			if (p.color == 1)
+			alphaBetaMax = alphaBeta(move, 3, -INF, INF, p.color);
+			if (maximum < alphaBetaMax)
 			{
-				alphaBetaMax = alphaBeta(move, 2, -INF, INF, 1);
-				if (maximum < alphaBetaMax)
-				{
-					maximum = alphaBetaMax;
-					nextMove = move;
-				}
-			}
-			else
-			{
-				alphaBetaMin = alphaBeta(move, 2, -INF, INF, 2);
-				if (minimum > alphaBetaMin)
-				{
-					minimum = alphaBetaMin;
-					nextMove = move;
-				}
+				maximum = alphaBetaMax;
+				nextMove = move;
 			}
 				
 		}
@@ -286,7 +278,7 @@ int Game::alphaBeta(Position node, int depth, int alpha, int beta, int color){
 			else if (tile.marblesPlayer1 < tile.marblesPlayer2)
 				sum2 += tile.size;
 		}
-		if (color == 1)
+		if (currentPlayer == 1)
 			return sum1 - sum2;
 		else
 			return sum2 - sum1;
@@ -302,8 +294,8 @@ int Game::alphaBeta(Position node, int depth, int alpha, int beta, int color){
 	}
 	std::vector<Position> _v;
 	getChildNodes(node, _v);
-	bool done = false;
-	for (size_t t = 0; t < _v.size() && !done; ++t){
+	//bool done = false;
+	for (size_t t = 0; t < _v.size(); ++t){
 		Position position = _v[t];
 		makeMove(color, position);
 		if (color == 1)
@@ -322,20 +314,24 @@ int Game::alphaBeta(Position node, int depth, int alpha, int beta, int color){
 			}
 			beta = std::min(beta, bestValue);
 		}
-		if (beta <= alpha)break;
 		unmakeMove(position, color);
+		if (beta <= alpha)break;
 	}
 	return bestValue;
 }
 
+// This function is giving me a lot of trouble.
 void Game::unmakeMove(Position position, Player player){
 	board.taken[position] = false;
+	// Safeguard vs possible invalid values.
+	if (indexLastPlayedTile >= 0 && position.horizontal >= 0 && position.vertical >= 0)
 	board.tiles[indexLastPlayedTile].marbles[position] = -1;
 	indexLastPlayedTile = indexSecondToLastPlayedTile;
 	indexSecondToLastPlayedTile = indexThirdToLastPlayedPosition;
-	lastPlayedPosition = secondToLastPlayedPosition;
+	indexThirdToLastPlayedPosition = -1;
+	lastPlayedPosition = secondToLastPlayedPosition; 
 	secondToLastPlayedPosition = thirdToLastPlayedPosition;
-
+	thirdToLastPlayedPosition = Position(-1, -1);
 	if (player.color == 1 && indexLastPlayedTile >= 0)
 		board.tiles[indexLastPlayedTile].marblesPlayer1--;
 	else if (player.color == 2 && indexLastPlayedTile >= 0)
@@ -371,7 +367,6 @@ bool Game::computerMakeMoveMinimax(Player p){
 					nextMove = move;
 				}
 			}
-
 		}
 		printf("Player %d will move %d\n horizontal and %d\n vertical\n", p, nextMove.horizontal, nextMove.vertical);
 
@@ -398,7 +393,7 @@ int Game::minimax(Position node, int depth, int color){
 			else if (tile.marblesPlayer1 < tile.marblesPlayer2)
 				sum2 += tile.size;
 		}
-		if (color == 1)
+		if (currentPlayer == 1)
 			return sum1 - sum2;
 		else
 			return sum2 - sum1;

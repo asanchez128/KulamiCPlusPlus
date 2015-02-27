@@ -25,18 +25,18 @@ int main(){
 	printf("Please choose kind of player for player1\n");
 	printf("1.- Human\n2.- Easy AI\n3.- Minimax AI\n4.- Alpha-beta AI\n");
 	scanf("%d", &optionPlayer1);
-	while (optionPlayer1 < 1 || optionPlayer1 > 3)
+	while (optionPlayer1 < 1 || optionPlayer1 > 4)
 	{
 		printf("Please enter a valid kind of player\n");
 		printf("Please choose kind of player for player1");
-		printf("1.- Human\n2.- Easy AI\n3.- Hard AI\n");
+		printf("1.- Human\n2.- Easy AI\n3.- Hard AI\n4.- Alpha-beta AI\n");
 		scanf("%d", &optionPlayer1);
 	} 
 
 	printf("Please choose kind of player for player2\n");
 	printf("1.- Human\n2.- Easy AI\n3.- Minimax AI\n4.- Alpha-beta AI\n");
 	scanf("%d", &optionPlayer2);
-	while (optionPlayer1 < 1 || optionPlayer1 > 3)
+	while (optionPlayer1 < 1 || optionPlayer1 > 4)
 	{
 		printf("Please enter a valid kind of player\n");
 		printf("Please choose kind of player for player2");
@@ -114,5 +114,8 @@ int main(){
 	}
 	printf("Done!\n");
 	game.getWinner();
+	getchar();
+	getchar();
+	getchar();
 	return 0;
 }
