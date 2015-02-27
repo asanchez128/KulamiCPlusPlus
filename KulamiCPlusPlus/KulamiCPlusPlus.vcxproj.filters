@@ -64,6 +64,8 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="output.txt" />
+    <Text Include="output.txt">
+      <Filter>Source Files</Filter>
+    </Text>
   </ItemGroup>
 </Project>

@@ -30,9 +30,11 @@ public:
 	void posibleNextMoves(std::vector<Position> &v);
 	void getWinner();
 	bool computerMakeMove(Player);
-	bool computerMakeMoveMinimax(Player);
-	int minimax(Position, int, int, int, bool, int);
+	bool computerMakeMovealphaBeta(Player);
+	int alphaBeta(Position, int, int, int, bool, int);
 	void unmakeMove(Position, Player);
     void getChildNodes(Position p, std::vector<Position> &v);
+	bool computerMakeMoveMinimax(Player);
+	int minimax(Position, int, bool, int);
 };
 
