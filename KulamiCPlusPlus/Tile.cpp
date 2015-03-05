@@ -23,7 +23,7 @@ Tile::Tile(int _width, int _height, Position _lowerLeft, Position _upperRight, i
 	marblesPlayer1 = marblesPlayer2 = 0;
 }
 
-bool Tile::isEmpty(Position position)
+bool Tile::isEmpty(Position position) // I never call this function
 {
 	return false;
 }

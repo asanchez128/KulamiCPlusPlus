@@ -8,12 +8,15 @@
 #include <ctime>    
 #define START 0
 #define END 7
+#define MAX_SIZE 6
+
 Game::Game()
 {
 	indexLastPlayedTile = -1;
 	indexSecondToLastPlayedTile = -1;
 	lastPlayedPosition.horizontal = -1;
-	lastPlayedPosition.vertical =  - 1;
+	lastPlayedPosition.vertical = -1;
+	indexMoves = -1;
 }
 
 Game::~Game()
@@ -36,20 +39,20 @@ bool Game::makeMove(Player player, Position position){
 	if (!board.isPositionTaken(position)){
 		if (!(positionIsInLastPlayedTile(position) || positionIsInSecondToLastPlayedTile(position))){
 			if ((positionIsInSameHorizontal(position) || positionIsInSameVertical(position) ) ){
-				board.taken[position] = true;
-				thirdToLastPlayedPosition = secondToLastPlayedPosition;
-				secondToLastPlayedPosition = lastPlayedPosition;
+				board.setBit(position);
+				//thirdToLastPlayedPosition = secondToLastPlayedPosition;
+				//secondToLastPlayedPosition = lastPlayedPosition;
 				lastPlayedPosition = position;
 
-				indexThirdToLastPlayedPosition = indexSecondToLastPlayedTile;
-				indexSecondToLastPlayedTile = indexLastPlayedTile;
-				indexLastPlayedTile = board.indexOfTileInPosition[position];
-				board.tiles[indexLastPlayedTile].marbles[position] = player.color;
+				//indexThirdToLastPlayedPosition = indexSecondToLastPlayedTile;
+				//indexSecondToLastPlayedTile = indexLastPlayedTile;
+				int indexPlayedTile = board.getTileInPosition(position);
+				board.tiles[indexPlayedTile].marbles[position] = player.color;
 				if (player.color == 1)
-					board.tiles[indexLastPlayedTile].marblesPlayer1++;
+					board.tiles[indexPlayedTile].marblesPlayer1++;
 				else if (player.color == 2)
-					board.tiles[indexLastPlayedTile].marblesPlayer2++;
-
+					board.tiles[indexPlayedTile].marblesPlayer2++;
+				moves[++indexMoves] = (Move(position, indexPlayedTile, player.color));
 				return true;
 			}
 		}
@@ -63,31 +66,40 @@ bool Game::makeMove(Player player, Position position){
 bool Game::positionIsInLastPlayedTile(Position position){
 	// check for out-of-bounds position
 	bool result = false;
-	if (board.indexOfTileInPosition[position] == indexLastPlayedTile){
+	if (indexMoves >= 0){
+		indexLastPlayedTile = moves[indexMoves].tileNumber;
+	}
+	else{
+		indexLastPlayedTile = -1;
+	}
+
+	if (board.getTileInPosition(position) == indexLastPlayedTile){
 		result = true;
 	}
 	return result;
 }
 
 bool Game::positionIsInSameVertical(Position position){
-	if (lastPlayedPosition.vertical == -1){
+	// No moves yet.
+	if (indexMoves < 0){
 		return true;
 	}
 	else 
-	return lastPlayedPosition.vertical == position.vertical;
+		return moves[indexMoves].position.vertical == position.vertical;
 }
 
 bool Game::positionIsInSameHorizontal(Position position){
-	if (lastPlayedPosition.horizontal == -1){
+	if (indexMoves < 0){
 		return true;
 	}
 	else
-	return lastPlayedPosition.horizontal == position.horizontal;
+		return moves[indexMoves].position.horizontal == position.horizontal;
 }
 bool Game::positionIsInSecondToLastPlayedTile(Position position){
 	// check for out-of-bounds position
 	bool result = false;
-	if (board.indexOfTileInPosition[position] == indexSecondToLastPlayedTile){
+	if (indexMoves > 0)
+	if (board.getTileInPosition(position) == moves[indexMoves - 1].tileNumber){
 		result = true;
 	}
 	return result;
@@ -95,18 +107,22 @@ bool Game::positionIsInSecondToLastPlayedTile(Position position){
 
 // v must be an empty vector of type Position
 void Game::posibleNextMoves(std::vector<Position> &v){
-	if (lastPlayedPosition.horizontal == -1 &&
-		lastPlayedPosition.vertical == -1)
+	if (indexMoves < 0)
 	{
 		// We are starting off this game
 		for (int i = START; i <= END; ++i){
 			for (int j = START; j <= END; ++j){
-				v.push_back(Position(i, j));
+				if (board.getSizeTileInPosition(Position(i, j)) == MAX_SIZE){
+					v.push_back(Position(i, j));
+				}
 			}
 		}
 	}
+
 	else
 	{
+		lastPlayedPosition = moves[indexMoves].position;
+		// Assume that 
 		for (int i = START; i < lastPlayedPosition.horizontal; ++i){
 			Position p(i, lastPlayedPosition.vertical);
 			if (!board.isPositionTaken(p)){
@@ -143,7 +159,10 @@ void Game::posibleNextMoves(std::vector<Position> &v){
 			}
 		}
 	}
-	
+	sort(v.begin(), v.end(), [&](const Position & a, const Position & b) -> bool{
+		return board.getSizeTileInPosition(a) > board.getSizeTileInPosition(b);
+	});
+
 	return;
 }
 
@@ -230,6 +249,10 @@ void Game::getChildNodes(Position q, std::vector<Position> &v)
 			}
 		}
 	}
+
+	sort(v.begin(), v.end(), [&](const Position & a, const Position & b) -> bool{
+		return board.getSizeTileInPosition(a) > board.getSizeTileInPosition(b);
+	});
 	return;
 
 }
@@ -245,13 +268,18 @@ bool Game::computerMakeMovealphaBeta(Player p){
 	if (!_v.empty()){
 		for (auto move : _v)
 		{
-			alphaBetaMax = alphaBeta(move, 3, -INF, INF, p.color);
+			makeMove(p.color, move);
+			if (p.color == 1)
+			 alphaBetaMax = alphaBeta(move, 3, -INF, INF, 2);
+			else
+				alphaBetaMax = alphaBeta(move, 3, -INF, INF, 1);
+			alphaBetaMax += board.getSizeTileInPosition(move);
 			if (maximum < alphaBetaMax)
 			{
 				maximum = alphaBetaMax;
 				nextMove = move;
 			}
-				
+			unmakeMove(move, p.color);
 		}
 		printf("Player %d will move %d\n horizontal and %d\n vertical\n", p, nextMove.horizontal, nextMove.vertical);
 		
@@ -293,15 +321,20 @@ int Game::alphaBeta(Position node, int depth, int alpha, int beta, int color){
 		bestValue = INF;
 	}
 	std::vector<Position> _v;
+	//makeMove(color, node);
 	getChildNodes(node, _v);
 	//bool done = false;
 	for (size_t t = 0; t < _v.size(); ++t){
 		Position position = _v[t];
-		makeMove(color, position);
-		if (color == 1)
+		if (color == 1){
+			makeMove(1, position);
 			val = alphaBeta(position, depth - 1, alpha, beta, 2);
-		else
+		}
+		else{
+			makeMove(2, position);
 			val = alphaBeta(position, depth - 1, alpha, beta, 1);
+		}
+		
 		if (currentPlayer == color){
 			if (val > bestValue){
 				bestValue = val;
@@ -317,21 +350,27 @@ int Game::alphaBeta(Position node, int depth, int alpha, int beta, int color){
 		unmakeMove(position, color);
 		if (beta <= alpha)break;
 	}
+	//unmakeMove(node, color);
 	return bestValue;
 }
 
 // This function is giving me a lot of trouble.
 void Game::unmakeMove(Position position, Player player){
-	board.taken[position] = false;
+	board.clearBit(position);
 	// Safeguard vs possible invalid values.
-	if (indexLastPlayedTile >= 0 && position.horizontal >= 0 && position.vertical >= 0)
+	indexLastPlayedTile = board.getTileInPosition(position);
+	
 	board.tiles[indexLastPlayedTile].marbles[position] = -1;
-	indexLastPlayedTile = indexSecondToLastPlayedTile;
+	/*indexLastPlayedTile = indexSecondToLastPlayedTile;
 	indexSecondToLastPlayedTile = indexThirdToLastPlayedPosition;
 	indexThirdToLastPlayedPosition = -1;
 	lastPlayedPosition = secondToLastPlayedPosition; 
 	secondToLastPlayedPosition = thirdToLastPlayedPosition;
-	thirdToLastPlayedPosition = Position(-1, -1);
+	thirdToLastPlayedPosition = Position(-1, -1);*/
+
+	if (indexMoves >= 0){
+		indexMoves--;
+	}
 	if (player.color == 1 && indexLastPlayedTile >= 0)
 		board.tiles[indexLastPlayedTile].marblesPlayer1--;
 	else if (player.color == 2 && indexLastPlayedTile >= 0)

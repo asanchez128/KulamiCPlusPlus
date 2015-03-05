@@ -12,7 +12,7 @@ private:
 public:
 	int width, height, size;
 	Position lowerLeft, upperRight;
-	std::map<Position, bool> taken;
+	std::map<Position, bool> taken; // I think I can get rid of this one
 	int indexTile;
 	bool lastPlayed = false;
 	bool secondToLastPlayed = false;

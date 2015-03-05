@@ -55,8 +55,8 @@ int main(){
 					printf("Please enter move for player 1\n");
 					std::cin >> x >> y;
 					if (sum == 1){
-						game.lastPlayedPosition.horizontal = x;
-						game.lastPlayedPosition.vertical = y;
+						//game.lastPlayedPosition.horizontal = x;
+						//game.lastPlayedPosition.vertical = y;
 					}
 				} while (!game.makeMove(player1, Position(x, y)));
 			}
@@ -85,10 +85,10 @@ int main(){
 					printf("Please enter move for player 2\n");
 					std::cin >> x >> y;
 					if (sum == 1){
-						game.lastPlayedPosition.horizontal = x;
-						game.lastPlayedPosition.vertical = y;
+						//game.lastPlayedPosition.horizontal = x;
+						//game.lastPlayedPosition.vertical = y;
 					}
-				} while (!game.makeMove(player1, Position(x, y)));
+				} while (!game.makeMove(player2, Position(x, y)));
 			}
 			else if (optionPlayer2 == 2)
 			{
@@ -110,9 +110,13 @@ int main(){
 		std::cout << std::endl << std::endl;
 		++sum;
 		game.getWinner();
-		getchar();
+		// getchar();
+		// getchar();
 	}
 	printf("Done!\n");
+	if (sum == 57){
+		printf("No more moves allowed as all players have used up all their marbles.\n\n");
+	}
 	game.getWinner();
 	getchar();
 	getchar();

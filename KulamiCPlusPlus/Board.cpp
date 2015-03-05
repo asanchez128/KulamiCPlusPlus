@@ -2,6 +2,7 @@
 #include "Board.h"
 
 Board::Board(){
+	taken = 0;
 }
 
 // ^ empty 
@@ -37,7 +38,7 @@ void Board::printBoard(){
 		}
 	}
 
-//	freopen("output.txt", "w", stdout);
+	//freopen("output.txt", "a", stdout);
 
 	for (int i = 1; i <= 27; ++i){
 		for (int j = 1; j <= 27; ++j){
@@ -45,18 +46,14 @@ void Board::printBoard(){
 		}
 		printf("\n");
 	}
-	//printf("\n\n");
+	printf("\n\n\n");
 }
 Board::~Board()
 {
 }
 
-bool Board::isPositionTaken(Position position){
-	bool result = false;
-	if (taken[position] == true){
-		result = true;
-	}
-	return result;
+bool Board::isPositionTaken(Position p){
+	return taken.test((8 * p.horizontal + p.vertical));
 }
 
 void Board::setTypeBoard(int type){
@@ -214,17 +211,31 @@ void Board::setTypeBoard(int type){
 		tiles.push_back(Tile(2, 3, Position(0, 2), Position(1, 4), 15));
 		tiles.push_back(Tile(2, 3, Position(2, 5), Position(3, 7), 16));
 	}
-	for (int i = 0; i <= 7; ++i){
-		for (int j = 0; j <= 7; ++j){
-			//taken[Position(i, j)] = false;
-			//taken[Position(i, j)].insert(false));
-			taken.insert(std::make_pair(Position(i, j), false));
-		}
-	}
+	
 	for (auto tile : tiles){
 		for (auto marble : tile.marbles){
 			//indexOfTileInPosition[marble.first] = tile.indexTile;
-			indexOfTileInPosition.insert((std::make_pair(marble.first, tile.indexTile)));
+			//indexOfTileInPosition.insert((std::make_pair(marble.first, tile.indexTile)));
+			tileInPosition[marble.first.horizontal][marble.first.vertical] = tile.indexTile;
+			sizeTileInPosition[marble.first.horizontal][marble.first.vertical] = tile.size;
 		}
 	}
+}
+
+
+// 
+void Board::setBit(Position p){
+	taken.set((p.horizontal * 8) + p.vertical);
+}
+
+void Board::clearBit(Position p){
+	taken.reset((p.horizontal * 8) + p.vertical);
+}
+
+int Board::getTileInPosition(Position p){
+	return tileInPosition[p.horizontal][p.vertical];
+}
+
+int Board::getSizeTileInPosition(Position p){
+	return sizeTileInPosition[p.horizontal][p.vertical];
 }

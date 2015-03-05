@@ -4,11 +4,9 @@
 #include <map>
 #include <cstdio>
 #include "Tile.h"
+#include <bitset>
+#define SIZE 8
 #pragma once
-
-#ifdef _MSC_VER
-#define _CRT_SECURE_NO_WARNINGS
-#endif
 
 class Board
 {
@@ -17,12 +15,17 @@ private:
 	
 public:
 	std::vector<Tile> tiles;
-	std::map<Position, bool> taken;
+	std::bitset<70> taken;
 	Board();
 	~Board();
-	std::map<Position, int> indexOfTileInPosition;
+	int tileInPosition[SIZE + 1][SIZE + 1];
+	int sizeTileInPosition[SIZE + 1][SIZE + 1];
 	bool isPositionTaken(Position);
 	void printBoard();
 	void Board::setTypeBoard(int);
+	void Board::setBit(Position);
+	void Board::clearBit(Position);
+	int Board::getTileInPosition(Position p);
+	int Board::getSizeTileInPosition(Position p);
 };
 

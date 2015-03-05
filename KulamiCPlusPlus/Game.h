@@ -4,19 +4,23 @@
 #include "Player.h"
 #include "Position.h"
 #include "Board.h"
+#include "Move.h"
 #include <vector>
+#define TAM 64
 class Game
 {
 private:
 	enum PlayerNumber{PLAYER_1, PLAYER_2};
 	int const INF = 1000000000;
-	int typeBoard = 6;
 public:
 	int currentPlayer;
 	Position lastPlayedPosition;
 	Position secondToLastPlayedPosition;
 	Position thirdToLastPlayedPosition;
 	int indexLastPlayedTile;
+	Move moves[TAM];
+	int tileInPosition[SIZE + 1][SIZE + 1];
+	int indexMoves;
 	int indexSecondToLastPlayedTile;
 	int indexThirdToLastPlayedPosition;
 	Board board;
